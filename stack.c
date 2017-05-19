@@ -3,37 +3,51 @@
 #include "da.h"
 #include "stack.h"
 
+typedef struct STACK{
+  DA *list;
+}STACK;
+
 //lifo
-stack *newStack(void (*d)(FILE *,void *)){
-  stack *s = malloc(sizeof(stack));
-  s->list = newDLL(d);
+STACK *newSTACK(void (*d)(FILE *,void *)){
+  STACK *s = malloc(sizeof(STACK));
+  s->list = newDA(d);
   return s;
 }
 
-void push(stack *items,void *value){
-  insertDLL(items->list,0,value);
+void push(STACK *items,void *value){
+  insertDA(items->list,value);
 }
 
-void *pop(stack *items){
-  void *r = removeDLL(items->list,0);
+void *pop(STACK *items){
+  void *r = removeDA(items->list);
   return r;
 }
 
-void *peekStack(stack *items){
-  return items->list->head->value;
+void *peekSTACK(STACK *items){
+  return getDA(items->list,0);
 }
 
-int sizeStack(stack *items){
+int sizeSTACK(STACK *items){
   return items->list->size;
 }
 
-void displayStack(FILE *fp,stack *items){
-  dllnode *temp = items->list->head;
-  fprintf(fp, "[" );
-  while(temp != NULL){
-    items->list->display(fp,temp->value);
-    if(temp->next != NULL){fprintf(fp,",");}
-    temp = temp->next;
-  }
-  fprintf(fp, "]");
+void displaySTACK(FILE *fp,STACK *items){
+  if(items->list->array == NULL){
+        fprintf(fp,"[]");
+        return;
+    }
+	int index = 0;
+	fprintf(fp,"[");
+	while(items->list->size - index > 0){
+		items->list->display(fp,a->array[index]);
+		if(index + 1 < items->list->size) {
+			fprintf(fp, ",");
+		}
+		index++;
+	}
+	fprintf(fp, "]");
+}
+
+void displaySTACKds(FILE *fp,STACK *items){
+  displayDA(fp,items->list);
 }

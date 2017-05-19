@@ -3,7 +3,7 @@
 #include "da.h"
 
 
-typedef struct DA{
+typedef struct Da{
 	void **array; 
 	int capacity; 
 	int size; 	  
@@ -63,6 +63,8 @@ void unionDA(DA *recipient, DA *donor){
         }
         i = 0;
         donor->array = NULL;
+		donor->capacity = 1;
+		donor->size = 0;
         /*while(i < donor->size){
             void *pointless = NULL;
             pointless = removeDA(donor);

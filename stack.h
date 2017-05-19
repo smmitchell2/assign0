@@ -1,16 +1,15 @@
 #include "da.h"
-#ifndef __Stack_INCLUDED__
-#define __Stack_INCLUDED__
+#ifndef __STACK_INCLUDED__
+#define __STACK_INCLUDED__
 
-typedef struct Stack{
-  DA *list;
-}stack;
+typedef struct STACK STACK;
 
-stack *newStack(void (*d)(FILE *d,void *));   //constructor
-void push(stack *items,void *value);         //stores a generic value
-void *pop(stack *items);                     //returns a generic value
-void *peekStack(stack *items);               //returns a generic value
-int sizeStack(stack *items);
-void displayStack(FILE *fp,stack *items);
+STACK *newSTACK(void (*d)(FILE *d,void *));   //constructor
+void push(STACK *items,void *value);         //stores a generic value
+void *pop(STACK *items);                     //returns a generic value
+void *peekSTACK(STACK *items);               //returns a generic value
+int sizeSTACK(STACK *items);
+void displaySTACK(FILE *fp,STACK *items);
+extern void displaySTACKds(FILE *,STACK *items);
 
 #endif
