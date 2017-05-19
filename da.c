@@ -3,7 +3,7 @@
 #include "da.h"
 
 
-typedef struct Da{
+typedef struct DA{
 	void **array; 
 	int capacity; 
 	int size; 	  
@@ -73,7 +73,6 @@ void unionDA(DA *recipient, DA *donor){
     }
 }
 
-
 void *getDA(DA *a,int index){
 	return a->array[index];
 }
@@ -93,6 +92,7 @@ int sizeDA(DA *a){
 void displayDA(FILE *fp,DA *a){
     if(a->array == NULL){
         fprintf(fp,"[]");
+		fprintf(fp, "[%d]", a->capacity - a->size);
         return;
     }
 	int index = 0;
@@ -105,5 +105,5 @@ void displayDA(FILE *fp,DA *a){
 		index++;
 	}
 	fprintf(fp, "]");
-	//fprintf(fp, "[%d]", a->capacity - a->size);
+	fprintf(fp, "[%d]", a->capacity - a->size);
 }
