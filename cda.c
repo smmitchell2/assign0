@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "cda.h"
-#include "integer.h"
 
 struct CDA{
 	void **array; 
 	int capacity; 
-	int size; 	  
+	int size;
+	int startIndex;
+	int endIndex; 	  
 	void (*display)(FILE *, void *); 
 };
 
@@ -15,14 +16,15 @@ CDA *newCDA(void (*display)(FILE *,void *)){
 	a->array = malloc(sizeof(void *)*1);
 	a->capacity = 1;
 	a->size = 0;
+	a->startIndex = 0;
+	a->endIndex = 0;
 	a->display = display;
 
 	return a;
 }
 
 void insertCDAFront(CDA *a,int index,void *v){
-	if(a->size == a->capacity) 
-	{
+	if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 	}
@@ -30,8 +32,7 @@ void insertCDAFront(CDA *a,int index,void *v){
 }
 
 void insertCDABack(CDA *a,int index,void *v){
-	if(a->size == a->capacity) 
-	{
+	if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 	}
@@ -99,18 +100,16 @@ int sizeDA(CDA *a){
 }
 
 void displayCDA(FILE *fp,CDA *a){
-
 	int index = 0;
-	fprintf(fp,"[");
+	fprintf(fp,"(");
 	while(a->size - index > 0){
 		a->display(fp,a->array[index]);
 		if(index + 1 < a->size) {
 			fprintf(fp, ",");
 		}
-
 		index++;
 	}
-	fprintf(fp, "]");
+	fprintf(fp, ")");
 
-	fprintf(fp, "[%d]", a->capacity - a->size);
+	fprintf(fp, "(%d)", a->capacity - a->size);
 }
