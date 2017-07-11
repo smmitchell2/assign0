@@ -28,7 +28,8 @@ void insertCDAFront(CDA *a,int index,void *v){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 	}
-	a->array[a->size++] = v;
+	int front = (a->startIndex + a->size) % a->capacity;
+	a->array[front] = v;
 }
 
 void insertCDABack(CDA *a,int index,void *v){
