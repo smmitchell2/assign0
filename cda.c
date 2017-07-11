@@ -41,18 +41,17 @@ void insertCDABack(CDA *a,int index,void *v){
 }
 
 void *removeCDAFront(CDA *a,int index){
-	void *rv = a->array[a->size-1];
 	if(a->size == 0){
 		fprintf(stderr, "Attempting to remove from an empty array\n");
 		exit(-1);
 	}
-
-	a->array[a->size-1] = NULL;
+	int front = (a->startIndex + a->size) % a->capacity;
+	void *rv = a->array[front];
+	a->array[front] = NULL;
 	--a->size;
 	double size = a->size;
 	double capacity = a->capacity;
 
-	
 	if(size < capacity/4.0 && capacity > 2){
 		a->capacity /= 2; 
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
