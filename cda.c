@@ -30,6 +30,7 @@ void insertCDAFront(CDA *a,int index,void *v){
 	}
 	int front = (a->startIndex + a->size) % a->capacity;
 	a->array[front] = v;
+	a->startIndex = front;
 }
 
 void insertCDABack(CDA *a,int index,void *v){
@@ -37,7 +38,10 @@ void insertCDABack(CDA *a,int index,void *v){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 	}
-	a->array[a->size++] = v;
+	int back = a->startIndex + a->size;
+	a->array[back] = v;
+	a->size++;
+	a->endIndex = back;
 }
 
 void *removeCDAFront(CDA *a,int index){
@@ -49,6 +53,7 @@ void *removeCDAFront(CDA *a,int index){
 	void *rv = a->array[front];
 	a->array[front] = NULL;
 	--a->size;
+	
 	double size = a->size;
 	double capacity = a->capacity;
 
@@ -56,40 +61,44 @@ void *removeCDAFront(CDA *a,int index){
 		a->capacity /= 2; 
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 	}
+	a->startIndex = (a->startIndex + a->size) % a->capacity;
 	return rv;
 }
 
 void *removeCDABack(CDA *a,int index){
-	void *rv = a->array[a->size-1];
+	void *rv = a->array[a->endIndex];
 	if(a->size == 0){
 		fprintf(stderr, "Attempting to remove from an empty array\n");
 		exit(-1);
 	}
 
-	a->array[a->size-1] = NULL;
+	a->array[a->endIndex] = NULL;
 	--a->size;
 	double size = a->size;
 	double capacity = a->capacity;
-
-	
 	if(size < capacity/4.0 && capacity > 2){
 		a->capacity /= 2; 
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 	}
+	a->endIndex = a->startIndex + a->size;
 	return rv;
 }
 
 void unionCDA(CDA *recipient,CDA *donor){
-    
+	for(int i = 0;i<=donor->size;++i){		
+    	void *rm = removeCDAFront(donor,0);
+		insertCDABack(recipient,0,rm);
+	}
 }
 
 void *getCDA(CDA *a,int index){
 	return a->array[index];
 }
 
-void setCDA(CDA *a,int index,void *value){ //fix
+void *setCDA(CDA *a,int index,void *value){ //fix
 	if(index == a->size) {
-		return insertCDA(a, value);
+		insertCDAFront(a,index,value);
+		return value;
 	}
 
 	a->array[index] = value;
