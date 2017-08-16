@@ -1,23 +1,23 @@
-OBJS = scanner.o integer.o real.o sll.o dll.o comparator.o  queue.o stack.o sqsort.o
+OBJS = scanner.o integer.o real.o da.o cda.o comparator.o  queue.o stack.o sqsort.o
 OOPTS = -Wall -std=c99 -c -g
 LOOPTS = -Wall -std=c99 -g
 
-sqsort : $(OBJS)
-	gcc $(LOOPTS) $(OBJS) -o sqsort
+typescript : $(OBJS)
+	gcc $(LOOPTS) $(OBJS) -o typescript
 
-sqsort.o : sqsort.c integer.h real.h scanner.h comparator.h sll.h dll.h stack.h queue.h
+typescript.o : typescript.c integer.h real.h scanner.h comparator.h da.h cda.h stack.h queue.h
 	gcc $(OOPTS) sqsort.c
 
-sll.o : sll.c sll.h
-	gcc $(OOPTS) sll.c
+da.o : da.c da.h
+	gcc $(OOPTS) da.c
 
-dll.o : dll.c dll.h
-	gcc $(OOPTS) dll.c
+cda.o : cda.c cda.h
+	gcc $(OOPTS) cda.c
 
-stack.o : stack.c stack.h dll.h
+stack.o : stack.c stack.h da.h
 	gcc $(OOPTS) stack.c
 
-queue.o : queue.c queue.h sll.h
+queue.o : queue.c queue.h cda.h
 	gcc $(OOPTS) queue.c
 
 comparator.o: comparator.c comparator.h integer.h real.h
@@ -34,9 +34,9 @@ scanner.o : scanner.c scanner.h
 
 test :
 	#testing integer file read#
-	sqsort -d num
+	typescript
 	@echo
 	@echo
-	
+
 clean   :
-	rm -f *.o sqsort
+	rm -f *.o typescript
