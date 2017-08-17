@@ -23,7 +23,7 @@ CDA *newCDA(void (*display)(FILE *,void *)){
 	return a;
 }
 
-void insertCDAfront(CDA *a,void *v){ //segfaults after 3 inserts
+void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 	if(a->size == 0){
 		a->array[0] = v;
 		++a->size;
@@ -32,11 +32,18 @@ void insertCDAfront(CDA *a,void *v){ //segfaults after 3 inserts
 	if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
+		int front = (a->startIndex + a->size) % a->capacity;
+		a->array[front] = v;
+		a->startIndex = front;
+		++a->size;
+		return;
 	}
-	int front = (a->startIndex + a->size) % a->capacity;
-	a->array[front] = v;
-	a->startIndex = front;
-	++a->size;
+	if(a->size < a->capacity){
+		a->array[a->size+1] = v;
+		++a->size;
+		return;
+		}
+
 }
 
 void insertCDAback(CDA *a,void *v){
@@ -135,16 +142,34 @@ void visualizeCDA(FILE *fp,CDA *a){
 }
 
 void displayCDA(FILE *fp,CDA *a){
-	int index = 0;
-	fprintf(fp,"(");
-	while(a->size - index > 0){
-		a->display(fp,a->array[index]);
-		if(index + 1 < a->size) {
-			fprintf(fp, ",");
-		}
-		index++;
-	}
-	fprintf(fp, ")");
 
-	//fprintf(fp, "(%d)", a->capacity - a->size);
+	fprintf(fp, "startIndex:%d endIndex:%d size:%d capacity:%d\n",a->startIndex,a->endIndex,a->size,a->capacity );
+	//a->display(fp,a->array[1]);
+
+	if(a->startIndex > a->endIndex){
+		fprintf(fp,"(");
+		int index = a->startIndex;
+		while(index >= a->endIndex ){
+			a->display(fp,a->array[index]);
+			if(index + 1 < a->size) {
+				fprintf(fp, ",");
+			}
+			index--;
+		}
+		fprintf(fp, ")");
+	}
+  //if(a->startIndex <= a->endIndex)
+	else{
+		int index = a->startIndex;
+		fprintf(fp,"(");
+		while(index <= a->endIndex ){
+			a->display(fp,a->array[index]);
+			if(index + 1 < a->size) {
+				fprintf(fp, ",");
+			}
+			index++;
+		}
+		fprintf(fp, ")");
+	}
+
 }

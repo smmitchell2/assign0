@@ -7,13 +7,13 @@
 
 
 int main(int argc,char **argv){
-    DA *a = newDA(displayInteger);
-    DA *b = newDA(displayInteger);
+    //DA *a = newDA(displayInteger);
+    //DA *b = newDA(displayInteger);
     CDA *c = newCDA(displayInteger);
     int i;
     void *v = NULL;
     //repeated 10000 times: insertDLL(a,0,v);
-    for(i = 0; i <= 10; ++i){
+    /*for(i = 0; i <= 10; ++i){
         v = newInteger(i);
         insertDA(a,v);
     }
@@ -21,9 +21,9 @@ int main(int argc,char **argv){
     for(i = 11; i <= 20; ++i){
         v = newInteger(i);
         insertDA(b,v);
-    }
+    }*/
     //repeated 10000 times: insertDLL(a,X,v);
-    /*for(i = 0; i < 10; ++i){
+    /*for(i = 0; i < 1000; ++i){
         //int X = rand() %9999;
         v = newInteger(i);
         //insertDLL(a,X,v);
@@ -32,19 +32,22 @@ int main(int argc,char **argv){
     v = newInteger(4);
     void *u = newInteger(5);
     void *y = newInteger(6);
+    void *z = newInteger(7);
     insertCDAfront(c,v);
     insertCDAfront(c,u);
-    insertCDAfront(c,y);
+    //insertCDAfront(c,y);
+    //insertCDAfront(c,z);
 
-    displayDA(stdout,a);
-    displayDA(stdout,b);
-    unionDA(a,b);
+    //displayDA(stdout,a);
+    //displayDA(stdout,b);
+    //unionDA(a,b);
 
-    fprintf(stdout,"\n");
-    displayDA(stdout,a);
-    displayDA(stdout,b);
+    //fprintf(stdout,"\n");
+    //displayDA(stdout,a);
+    //displayDA(stdout,b);
    // fprintf(stdout,"the size is %d\n",a->size);
    fprintf(stdout,"\n");
    displayCDA(stdout,c);
+   fprintf(stdout,"\n");
 
 }
