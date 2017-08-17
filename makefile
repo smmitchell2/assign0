@@ -1,4 +1,4 @@
-OBJS = scanner.o integer.o real.o da.o cda.o comparator.o  queue.o stack.o sqsort.o
+OBJS = scanner.o integer.o real.o da.o cda.o comparator.o  queue.o stack.o typescript.o
 OOPTS = -Wall -std=c99 -c -g
 LOOPTS = -Wall -std=c99 -g
 
@@ -6,7 +6,7 @@ typescript : $(OBJS)
 	gcc $(LOOPTS) $(OBJS) -o typescript
 
 typescript.o : typescript.c integer.h real.h scanner.h comparator.h da.h cda.h stack.h queue.h
-	gcc $(OOPTS) sqsort.c
+	gcc $(OOPTS) typescript.c
 
 da.o : da.c da.h
 	gcc $(OOPTS) da.c

@@ -4,14 +4,14 @@
 
 
 typedef struct DA{
-	void **array; 
-	int capacity; 
-	int size; 	  
-	void (*display)(FILE *, void *); 
+	void **array;
+	int capacity;
+	int size;
+	void (*display)(FILE *, void *);
 }DA;
 
 DA *newDA(void (*display)(FILE *,void *)){
-	DA *a = malloc(sizeof(DA)); 
+	DA *a = malloc(sizeof(DA));
 	a->array = malloc(sizeof(void *)*1);
 	a->capacity = 1;
 	a->size = 0;
@@ -41,7 +41,7 @@ void *removeDA(DA *a){
 	double capacity = a->capacity;
 
 	if(size < capacity/4.0 && capacity > 2){
-		a->capacity /= 2; 
+		a->capacity /= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 	}
 	return rv;
@@ -85,14 +85,37 @@ void setDA(DA *a,int index,void *value){
 	a->array[index] = value;
 }
 
+void **extractDA(DA *items){
+	return items->array;
+}
+
 int sizeDA(DA *a){
 	return a->size;
+}
+
+void visualizeDA(FILE *fp,DA *a){
+	if(a->array == NULL){
+			fprintf(fp,"[]");
+	fprintf(fp, "[%d]", a->capacity - a->size);
+			return;
+	}
+	int index = 0;
+	fprintf(fp,"[");
+	while(a->size - index > 0){
+		a->display(fp,a->array[index]);
+		if(index + 1 < a->size) {
+			fprintf(fp, ",");
+		}
+		index++;
+	}
+	fprintf(fp, "]");
+	fprintf(fp, "[%d]", a->capacity - a->size);
 }
 
 void displayDA(FILE *fp,DA *a){
     if(a->array == NULL){
         fprintf(fp,"[]");
-		fprintf(fp, "[%d]", a->capacity - a->size);
+		//fprintf(fp, "[%d]", a->capacity - a->size);
         return;
     }
 	int index = 0;
@@ -105,5 +128,5 @@ void displayDA(FILE *fp,DA *a){
 		index++;
 	}
 	fprintf(fp, "]");
-	fprintf(fp, "[%d]", a->capacity - a->size);
+	//fprintf(fp, "[%d]", a->capacity - a->size);
 }

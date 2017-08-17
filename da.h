@@ -12,7 +12,9 @@ extern void *removeDA(DA *a);
 extern void unionDA(DA *recipient, DA *donor);
 extern void *getDA(DA *a,int index);
 extern void setDA(DA *a,int index,void *value);
+extern void **extractDA(DA *items);
 extern int sizeDA(DA *a);
-extern void displayDA(FILE *,DA *a);
+extern void visualizeDA(FILE *fp,DA *items);
+extern void displayDA(FILE *fp,DA *a);
 
 #endif

@@ -23,7 +23,12 @@ CDA *newCDA(void (*display)(FILE *,void *)){
 	return a;
 }
 
-void insertCDAFront(CDA *a,int index,void *v){
+void insertCDAfront(CDA *a,void *v){ //segfaults after 3 inserts
+	if(a->size == 0){
+		a->array[0] = v;
+		++a->size;
+		return;
+	}
 	if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
@@ -31,9 +36,10 @@ void insertCDAFront(CDA *a,int index,void *v){
 	int front = (a->startIndex + a->size) % a->capacity;
 	a->array[front] = v;
 	a->startIndex = front;
+	++a->size;
 }
 
-void insertCDABack(CDA *a,int index,void *v){
+void insertCDAback(CDA *a,void *v){
 	if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
@@ -44,7 +50,7 @@ void insertCDABack(CDA *a,int index,void *v){
 	a->endIndex = back;
 }
 
-void *removeCDAFront(CDA *a,int index){
+void *removeCDAfront(CDA *a){
 	if(a->size == 0){
 		fprintf(stderr, "Attempting to remove from an empty array\n");
 		exit(-1);
@@ -65,7 +71,7 @@ void *removeCDAFront(CDA *a,int index){
 	return rv;
 }
 
-void *removeCDABack(CDA *a,int index){
+void *removeCDAback(CDA *a){
 	void *rv = a->array[a->endIndex];
 	if(a->size == 0){
 		fprintf(stderr, "Attempting to remove from an empty array\n");
@@ -86,8 +92,8 @@ void *removeCDABack(CDA *a,int index){
 
 void unionCDA(CDA *recipient,CDA *donor){
 	for(int i = 0;i<=donor->size;++i){
-    	void *rm = removeCDAFront(donor,0);
-		insertCDABack(recipient,0,rm);
+    	void *rm = removeCDAfront(donor);
+		insertCDAback(recipient,rm);
 	}
 }
 
@@ -97,7 +103,7 @@ void *getCDA(CDA *a,int index){
 
 void *setCDA(CDA *a,int index,void *value){ //fix
 	if(index == a->size) {
-		insertCDAFront(a,index,value);
+		insertCDAfront(a,value);
 		return value;
 	}
 
@@ -105,8 +111,27 @@ void *setCDA(CDA *a,int index,void *value){ //fix
 	return value;
 }
 
+void **extractCDA(CDA *items){
+	return items->array;
+}
+
 int sizeCDA(CDA *a){
 	return a->size;
+}
+
+void visualizeCDA(FILE *fp,CDA *a){
+	int index = 0;
+	fprintf(fp,"(");
+	while(a->size - index > 0){
+		a->display(fp,a->array[index]);
+		if(index + 1 < a->size) {
+			fprintf(fp, ",");
+		}
+		index++;
+	}
+	fprintf(fp, ")");
+
+	fprintf(fp, "(%d)", a->capacity - a->size);
 }
 
 void displayCDA(FILE *fp,CDA *a){
@@ -121,5 +146,5 @@ void displayCDA(FILE *fp,CDA *a){
 	}
 	fprintf(fp, ")");
 
-	fprintf(fp, "(%d)", a->capacity - a->size);
+	//fprintf(fp, "(%d)", a->capacity - a->size);
 }

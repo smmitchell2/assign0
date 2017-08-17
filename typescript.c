@@ -23,12 +23,18 @@ int main(int argc,char **argv){
         insertDA(b,v);
     }
     //repeated 10000 times: insertDLL(a,X,v);
-    for(i = 0; i < 10; ++i){
+    /*for(i = 0; i < 10; ++i){
         //int X = rand() %9999;
         v = newInteger(i);
         //insertDLL(a,X,v);
-        insertCDAFront(c,0,v);
-    }
+        insertCDAfront(c,v);
+    }*/
+    v = newInteger(4);
+    void *u = newInteger(5);
+    void *y = newInteger(6);
+    insertCDAfront(c,v);
+    insertCDAfront(c,u);
+    insertCDAfront(c,y);
 
     displayDA(stdout,a);
     displayDA(stdout,b);
