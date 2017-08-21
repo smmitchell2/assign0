@@ -6,16 +6,16 @@
 //fifo
 queue *newQueue(void (*d)(FILE *,void *)){
   queue *q = malloc(sizeof(queue));
-  q->list = newSLL(d);
+  q->list = newCDA(d);
   return q;
 }
 
 void enqueue(queue *items,void *value){
-  insertSLL(items->list,items->list->size ,value);
+  insertCDAfront(items->list,items->list->size ,value);
 }
 
 void *dequeue(queue *items){
-  void *r = removeSLL(items->list,0);
+  void *r = removeCDAfront(items->list,0);
   return r;
 }
 
