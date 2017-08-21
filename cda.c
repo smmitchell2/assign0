@@ -33,12 +33,16 @@ int correctIndex(CDA *a,int cap,int i){
 }
 
 void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
-	if(a->size == 0){
+	/*if(a->size == 0){
 		a->array[0] = v;
 		++a->size;
 		return;
 	}
-	/*
+	if(a->size == a->capacity){
+		a->capacity *= 2;
+		a->array = realloc(a->array, a->capacity * sizeof(void *));
+	}
+
 	if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
@@ -70,7 +74,6 @@ void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 		a->array[a->startIndex] = v;
 		++a->size;
 	}
-
 }
 
 void insertCDAback(CDA *a,void *v){
