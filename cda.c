@@ -33,7 +33,7 @@ int correctIndex(CDA *a,int cap,int i){
 }
 
 void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
-	/*if(a->size == 0){
+	if(a->size == 0){
 		a->array[0] = v;
 		++a->size;
 		return;
@@ -43,7 +43,7 @@ void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 	}
 
-	if(a->size == a->capacity){
+	/*if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 		int front = (a->startIndex + a->size) % a->capacity;
@@ -51,29 +51,19 @@ void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 		a->startIndex = front;
 		++a->size;
 		return;
-	}
-	if(a->size < a->capacity){
-		a->array[a->size+1] = v;
-		++a->size;
-		return;
-	}*/
-	if(a->size == a->capacity){
-		a->capacity *= 2;
-		a->array = realloc(a->array, a->capacity * sizeof(void *));
-	}
-	/*if(a->size == 0){
-		insertCDAback(a,v);
 	}*/
 	if(a->startIndex == 0){
-		a->startIndex = correctIndex(a,a->capacity,a->startIndex-1);
-		a->array[a->startIndex] = v;
+		a->array[a->capacity-1] = v;
+		a->startIndex = a->capacity-1;
 		++a->size;
+		return;
 	}
 	else{
-		a->startIndex = correctIndex(a,a->capacity,a->startIndex-1);
-		a->array[a->startIndex] = v;
+		a->array[a->startIndex-1] = v;
+		a->startIndex = a->startIndex-1;
 		++a->size;
 	}
+
 }
 
 void insertCDAback(CDA *a,void *v){
