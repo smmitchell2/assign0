@@ -4,7 +4,7 @@
 #ifndef __DA_INCLUDED__
 #define __DA_INCLUDED__
 
-typedef struct DA DA;
+typedef struct da DA;
 
 extern DA *newDA(void (*display)(FILE *,void *));
 extern void insertDA(DA *a,void *v);

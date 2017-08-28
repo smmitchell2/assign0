@@ -3,7 +3,7 @@
 
 #include <stdio.h>
 
-typedef struct CDA CDA;
+typedef struct cda CDA;
 
 extern CDA *newCDA(void (*d)(FILE *,void *));
 int correctIndex(CDA *a,int cap,int i);
