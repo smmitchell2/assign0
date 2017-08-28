@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include "cda.h"
 
-typedef struct CDA{
+typedef struct cda{
 	void **array;
 	int capacity;
 	int size;

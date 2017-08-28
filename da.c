@@ -3,7 +3,7 @@
 #include "da.h"
 
 
-typedef struct DA{
+typedef struct da{
 	void **array;
 	int capacity;
 	int size;
