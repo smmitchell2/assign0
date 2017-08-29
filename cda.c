@@ -2,14 +2,14 @@
 #include <stdlib.h>
 #include "cda.h"
 
-typedef struct cda{
+struct cda{
 	void **array;
 	int capacity;
 	int size;
 	int startIndex;
 	int endIndex;
 	void (*display)(FILE *, void *);
-}CDA;
+};
 
 CDA *newCDA(void (*display)(FILE *,void *)){
 	CDA *a = malloc(sizeof(CDA));
@@ -23,12 +23,11 @@ CDA *newCDA(void (*display)(FILE *,void *)){
 	return a;
 }
 
-int correctIndex(CDA *a,int cap,int i){
-	if(i < 0){
-		i = (a->startIndex + a->size) % a->capacity;
-		//i = i + cap;
-	}
-
+int correctIndex(CDA *a,int i){
+	if(i<0){i = i + a->capacity;}
+	//i = (a->startIndex + a->size) % a->capacity;
+	i = (i + a->capacity) % a->capacity;
+	fprintf(stdout,"%d\n",i);
 	return i;
 }
 
@@ -36,40 +35,27 @@ int correctIndex(CDA *a,int cap,int i){
 //after removal front (front + 1)%length
 void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 	if(a->size == 0){
-		a->array[0] = v;
-		++a->size;
+		insertCDAback(a,v);
 		return;
 	}
 	if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
-	}
-	if(a->startIndex == 0){
-		a->array[a->capacity-1] = v;
-		a->startIndex = a->capacity-1;
-		++a->size;
-		return;
-	}
-	else{
-		a->array[a->startIndex-1] = v;
-		a->startIndex = a->startIndex-1;
-		++a->size;
-	}
 
+	}
+	a->startIndex = correctIndex(a,a->startIndex-1);
+    a->array[a->startIndex] = v;
+    a->size += 1;
 }
 
 void insertCDAback(CDA *a,void *v){
-	if(a->size == a->capacity){
+	/*if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
-	}
-	/*int back = a->startIndex + a->size;
-	a->array[back] = v;
-	a->size++;
-	a->endIndex = back;*/
+	}*/
 	a->array[a->endIndex] = v;
-	a->endIndex = correctIndex(a,a->capacity,a->endIndex+1);
-	++a->size;
+    a->endIndex = correctIndex(a,a->endIndex+1);
+    a->size += 1;
 }
 
 void *removeCDAfront(CDA *a){
@@ -195,4 +181,18 @@ void displayCDA(FILE *fp,CDA *a){
 		fprintf(fp, ")");
 	}
 
+}
+
+void cdaCompleteDisplay(FILE *fp,CDA *a){
+	fprintf(fp, "startIndex:%d endIndex:%d size:%d capacity:%d\n",a->startIndex,a->endIndex,a->size,a->capacity );
+	int i = 0;
+	while (i < a->capacity){
+		if(a->array[i] == NULL){fprintf(fp,"[%d]: NULL \n",i);}
+		else{
+			fprintf(fp,"[%d]: ",i);
+			a->display(fp,a->array[i]);
+			fprintf(fp,"\n");
+		}
+		++i;
+	}
 }

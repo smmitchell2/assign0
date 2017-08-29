@@ -3,12 +3,12 @@
 #include "da.h"
 
 
-typedef struct da{
+struct da{
 	void **array;
 	int capacity;
 	int size;
 	void (*display)(FILE *, void *);
-}DA;
+};
 
 DA *newDA(void (*display)(FILE *,void *)){
 	DA *a = malloc(sizeof(DA));

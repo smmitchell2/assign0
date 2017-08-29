@@ -47,7 +47,8 @@ int main(int argc,char **argv){
     //displayDA(stdout,b);
    // fprintf(stdout,"the size is %d\n",a->size);
    fprintf(stdout,"\n");
-   displayCDA(stdout,c);
+   //displayCDA(stdout,c);
+   cdaCompleteDisplay(stdout,c);
    fprintf(stdout,"\n");
 
 }
