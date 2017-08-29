@@ -37,6 +37,8 @@ int main(int argc,char **argv){
     insertCDAfront(c,u);
     insertCDAfront(c,y);
     insertCDAfront(c,z);
+    void *a = newInteger(8);
+    insertCDAfront(c,a);
 
     //displayDA(stdout,a);
     //displayDA(stdout,b);

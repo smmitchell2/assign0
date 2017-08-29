@@ -25,9 +25,9 @@ CDA *newCDA(void (*display)(FILE *,void *)){
 
 int correctIndex(CDA *a,int i){
 	if(i<0){i = i + a->capacity;}
-	//i = (a->startIndex + a->size) % a->capacity;
-	i = (i + a->capacity) % a->capacity;
-	fprintf(stdout,"%d\n",i);
+	i = (a->startIndex + a->size) % a->capacity;
+	//i = (i + a->capacity) % a->capacity;
+	//fprintf(stdout,"%d\n",i);
 	return i;
 }
 
@@ -43,18 +43,18 @@ void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
 
 	}
-	a->startIndex = correctIndex(a,a->startIndex-1);
+	a->startIndex = (a->startIndex + a->size) % a->capacity;//correctIndex(a,a->startIndex-1);
     a->array[a->startIndex] = v;
     a->size += 1;
 }
 
 void insertCDAback(CDA *a,void *v){
-	/*if(a->size == a->capacity){
+	if(a->size == a->capacity){
 		a->capacity *= 2;
 		a->array = realloc(a->array, a->capacity * sizeof(void *));
-	}*/
+	}
 	a->array[a->endIndex] = v;
-    a->endIndex = correctIndex(a,a->endIndex+1);
+    a->endIndex = a->endIndex+1;//correctIndex(a,a->endIndex+1);
     a->size += 1;
 }
 
