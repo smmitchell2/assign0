@@ -26,7 +26,6 @@ CDA *newCDA(void (*display)(FILE *,void *)){
 int correctIndex(CDA *a,int i){
 	//i = (a->startIndex + a->size) % a->capacity;
 	i = (i + a->capacity) % a->capacity;
-	//fprintf(stdout,"%d\n",i);
 	return i;
 }
 
