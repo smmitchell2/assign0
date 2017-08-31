@@ -29,6 +29,7 @@ int correctIndex(CDA *a,int i){
 	return i;
 }
 
+// need to create new array when full
 //back should be (front + count - 1)%length
 //after removal front (front + 1)%length
 void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
@@ -36,11 +37,25 @@ void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 		insertCDAback(a,v);
 		return;
 	}
-	if(a->size == a->capacity){
+	if(a->size == a->capacity){	
+		int newCapacity = a->capacity*2;
+		/*need to put all values from old array to new array*/
+		void **newArray =  malloc(sizeof(void *)*newCapacity);
+		int i = 0;
+		while(i<a->size){
+			if(a->startIndex+i < a->capacity){
+				newArray[i] = getCDA(a,a->startIndex+i);
+			}
+			else{
+				//need to figure how to go back to 0 and increment from there
+				newArray[i] = getCDA(a,i);
+			}
+			++i;
+		}
+		a->array = newArray;
 		a->capacity *= 2;
-		a->array = realloc(a->array, a->capacity * sizeof(void *));
-
 	}
+
 	a->startIndex = correctIndex(a,a->startIndex-1);
     a->array[a->startIndex] = v;
     a->size += 1;
