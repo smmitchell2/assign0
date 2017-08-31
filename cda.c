@@ -42,13 +42,15 @@ void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 		/*need to put all values from old array to new array*/
 		void **newArray =  malloc(sizeof(void *)*newCapacity);
 		int i = 0;
+		int j = 0;
 		while(i<a->size){
 			if(a->startIndex+i < a->capacity){
 				newArray[i] = getCDA(a,a->startIndex+i);
 			}
 			else{
 				//need to figure how to go back to 0 and increment from there
-				newArray[i] = getCDA(a,i);
+				newArray[j] = getCDA(a,a->capacity-a->size-i+j);
+				++j;
 			}
 			++i;
 		}
