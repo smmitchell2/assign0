@@ -49,7 +49,7 @@ void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
 			}
 			else{
 				//need to figure how to go back to 0 and increment from there
-				newArray[j] = getCDA(a,a->capacity-a->size-i+j);
+				newArray[j] = getCDA(a,j);
 				++j;
 			}
 			++i;
