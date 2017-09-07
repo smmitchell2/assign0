@@ -116,7 +116,7 @@ void *
 removeCDAfront(CDA *items){
 
 	assert(items->size > 0);
-
+	
 	if ((0.25 > items->size /(double) items->capacity) && items->capacity != 1){
 		shrink(items);
 	}
@@ -133,7 +133,7 @@ void *
 removeCDAback(CDA *items){
 
 	assert(items->size > 0);
-
+	
 	if ((0.25 > items->size /(double) items->capacity) && items->capacity != 1){
 		shrink(items);
 	}
