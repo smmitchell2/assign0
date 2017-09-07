@@ -1,16 +1,16 @@
-#include "cda.h"
-#ifndef __Queue_INCLUDED__
-#define __Queue_INCLUDED__
+#ifndef __QUEUE_INCLUDED__
+#define __QUEUE_INCLUDED__
 
-typedef struct Queue{
-  CDA *list;
-}queue;
+#include <stdio.h>
 
-queue *newQueue(void (*d)(FILE *,void *));   //constructor
-void enqueue(queue *items,void *value);      //stores a generic value
-void *dequeue(queue *items);                 //returns a generic value
-void *peekQueue(queue *items);               //returns a generic value
-int sizeQueue(queue *items);
-void displayQueue(FILE *fp,queue *items);
+typedef struct queue QUEUE;
+
+extern QUEUE *newQUEUE(void (*d)(FILE *,void *)); 
+extern void enqueue(QUEUE *items,void *value);
+extern void *dequeue(QUEUE *items);
+extern void *peekQUEUE(QUEUE *items);
+extern int sizeQUEUE(QUEUE *items);
+extern void displayQUEUE(FILE *,QUEUE *items);
+extern void visualizeQUEUE(FILE *,QUEUE *items);
 
 #endif

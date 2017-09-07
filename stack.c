@@ -1,53 +1,70 @@
-#include <stdlib.h>
 #include <stdio.h>
-#include "da.h"
-#include "stack.h"
+#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
+#include"stack.h"
+#include"da.h"
 
-typedef struct STACK{
-  DA *list;
-}STACK;
+struct stack{
+	DA *stackItems;
+	void(*display) (FILE *, void *);
+};
 
-//lifo
-STACK *newSTACK(void (*d)(FILE *,void *)){
-  STACK *s = malloc(sizeof(STACK));
-  s->list = newDA(d);
-  return s;
+/****** public methods ******/
+
+STACK *
+newSTACK(void(*d)(FILE *, void *)){
+
+	STACK *items = malloc(sizeof(STACK));
+
+	assert(items != 0);
+	items->stackItems = newDA(d);
+	items->display = d;
+	
+	return items;
 }
 
-void push(STACK *items,void *value){
-  insertDA(items->list,value);
+void
+push(STACK *items, void *value){
+	insertDA(items->stackItems, value);
 }
 
-void *pop(STACK *items){
-  void *r = removeDA(items->list);
-  return r;
+void *
+pop(STACK *items){
+	assert(sizeDA(items->stackItems) > 0);
+
+	return removeDA(items->stackItems);
 }
 
-void *peekSTACK(STACK *items){
-  return getDA(items->list,0);
+void *
+peekSTACK(STACK *items){
+	assert(sizeDA(items->stackItems) > 0);
+
+	return getDA(items->stackItems, sizeDA(items->stackItems) - 1);
 }
 
-int sizeSTACK(STACK *items){
-  return items->list->size;
+int 
+sizeSTACK(STACK *items){
+	return sizeDA(items->stackItems);
 }
 
-void displaySTACK(FILE *fp,STACK *items){
-  if(items->list->array == NULL){
-        fprintf(fp,"[]");
-        return;
-    }
-	int index = 0;
-	fprintf(fp,"[");
-	while(items->list->size - index > 0){
-		items->list->display(fp,a->array[index]);
-		if(index + 1 < items->list->size) {
+void
+displaySTACK(FILE *fp, STACK *items){
+	int size = sizeDA(items->stackItems);
+  int i = size-1;
+	fprintf(fp, "|");
+	while(i >= 0){
+		items->display(fp, getDA(items->stackItems,i));
+		if (i < size && i != 0){
 			fprintf(fp, ",");
 		}
-		index++;
+    --i;
 	}
-	fprintf(fp, "]");
+
+	fprintf(fp, "|");
 }
 
-void displaySTACKds(FILE *fp,STACK *items){
-  displayDA(fp,items->list);
+void
+visualizeSTACK(FILE *fp, STACK *items){
+	displayDA(fp, items->stackItems);
 }

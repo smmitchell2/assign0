@@ -6,7 +6,6 @@
 typedef struct cda CDA;
 
 extern CDA *newCDA(void (*d)(FILE *,void *));
-int correctIndex(CDA *a,int i);
 extern void insertCDAfront(CDA *items,void *value);
 extern void insertCDAback(CDA *items,void *value);
 extern void *removeCDAfront(CDA *items);

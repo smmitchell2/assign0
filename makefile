@@ -1,12 +1,23 @@
-OBJS = scanner.o integer.o real.o da.o cda.o comparator.o  queue.o stack.o typescript.o
+DAOBJS = integer.o da.o test-da.o
+CDAOBJS = integer.o cda.o test-cda.o
+STACKOBJS = integer.o da.o stack.o test-stack.o
+QUEUEOBJS = integer.o cda.o queue.o test-queue.o
 OOPTS = -Wall -std=c99 -c -g
 LOOPTS = -Wall -std=c99 -g
 
-typescript : $(OBJS)
-	gcc $(LOOPTS) $(OBJS) -o typescript
+all : test-da test-cda test-stack test-queue
 
-typescript.o : typescript.c integer.h real.h scanner.h comparator.h da.h cda.h stack.h queue.h
-	gcc $(OOPTS) typescript.c
+test-da : $(DAOBJS)
+	gcc $(LOOPTS) -o test-da $(DAOBJS)
+
+test-cda : $(CDAOBJS)
+	gcc $(LOOPTS) -o test-cda $(CDAOBJS)
+
+test-stack : $(STACKOBJS)
+	gcc $(LOOPTS) -o test-stack $(STACKOBJS)
+
+test-queue : $(QUEUEOBJS)
+	gcc $(LOOPTS) -o test-queue $(QUEUEOBJS)
 
 da.o : da.c da.h
 	gcc $(OOPTS) da.c
@@ -20,23 +31,37 @@ stack.o : stack.c stack.h da.h
 queue.o : queue.c queue.h cda.h
 	gcc $(OOPTS) queue.c
 
-comparator.o: comparator.c comparator.h integer.h real.h
-	gcc $(OOPTS) comparator.c
-
 integer.o : integer.c integer.h
 	gcc $(OOPTS) integer.c
 
-real.o : real.c real.h
-	gcc $(OOPTS) real.c
+test-da.o : test-da.c integer.h da.h
+	gcc $(OOPTS) test-da.c
 
-scanner.o : scanner.c scanner.h
-	gcc $(OOPTS) scanner.c
+test-cda.o : test-cda.c integer.h cda.h
+	gcc $(OOPTS) test-cda.c
+
+test-stack.o : test-stack.c integer.h da.h stack.h
+	gcc $(OOPTS) test-stack.c
+
+test-queue.o : test-queue.c integer.h cda.h queue.h
+	gcc $(OOPTS) test-queue.c
 
 test :
-	#testing integer file read#
-	typescript
+	#testing da#
+	test-da
 	@echo
+	@echo
+	#testing cda#
+	test-cda
+	@echo
+	@echo
+	#testing stack#
+	test-stack
+	@echo
+	@echo
+	#testing queue#
+	test-queue
 	@echo
 
 clean   :
-	rm -f *.o typescript
+	rm -f *.o test-da test-cda test-stack test-queue

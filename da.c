@@ -1,132 +1,173 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <string.h>
 #include "da.h"
 
-
 struct da{
-	void **array;
-	int capacity;
 	int size;
-	void (*display)(FILE *, void *);
+	int capacity;
+	void **store;
+	int factor;
+	void (*display) (FILE *, void *);
 };
 
-DA *newDA(void (*display)(FILE *,void *)){
-	DA *a = malloc(sizeof(DA));
-	a->array = malloc(sizeof(void *)*1);
-	a->capacity = 1;
-	a->size = 0;
-	a->display = display;
+/****** public methods ******/
 
-	return a;
+DA *
+newDA(void (*d)(FILE *, void *)){
+
+	DA *items = malloc(sizeof(DA));
+
+	assert(items != 0);
+
+	items->size = 0;
+	items->capacity = 1;
+	items->store = malloc(sizeof(void *) * items->capacity);
+	
+	assert(items->store != 0);
+
+	items->factor = 2;
+	items->display = d;
+
+	return items;
 }
 
-void insertDA(DA *a,void *v){
-	if(a->size == a->capacity){
-		a->capacity *= 2;
-		a->array = realloc(a->array, a->capacity * sizeof(void *));
-	}
-	a->array[a->size++] = v;
-}
+void
+insertDA(DA *items, void *value){
 
-void *removeDA(DA *a){
-	void *rv = a->array[a->size-1];
-	if(a->size == 0){
-		fprintf(stderr, "Attempting to remove from an empty array\n");
-		exit(-1);
-	}
+	assert(items != 0);
 
-	a->array[a->size-1] = NULL;
-	--a->size;
-	double size = a->size;
-	double capacity = a->capacity;
-
-	if(size < capacity/4.0 && capacity > 2){
-		a->capacity /= 2;
-		a->array = realloc(a->array, a->capacity * sizeof(void *));
-	}
-	return rv;
-}
-
-void unionDA(DA *recipient, DA *donor){
-    if(recipient->size == 0 && donor->size == 0){return;}
-    else if(recipient->size == 0 && donor->size != 0){
-        recipient = donor;
-        donor->size = 0;
-        donor = NULL;
-    }
-    else if(recipient->size != 0 && donor->size == 0){return;}
-    else{
-        int i = 0;
-        while(i < donor->size){
-            insertDA(recipient,donor->array[i]);
-            ++i;
-        }
-        i = 0;
-        donor->array = NULL;
-		donor->capacity = 1;
-		donor->size = 0;
-        /*while(i < donor->size){
-            void *pointless = NULL;
-            pointless = removeDA(donor);
-            ++i;
-        }*/
-    }
-}
-
-void *getDA(DA *a,int index){
-	return a->array[index];
-}
-
-void setDA(DA *a,int index,void *value){
-	if(index == a->size) {
-		return insertDA(a, value);
+	if (items->size == items->capacity){
+		items->capacity = items->capacity * items->factor;
+		items->store = realloc(items->store, sizeof(void *) * items->capacity);
+		assert(items->store != 0);
 	}
 
-	a->array[index] = value;
+	items->store[items->size] = value;
+
+	++items->size;
+	return;
 }
 
-void **extractDA(DA *items){
-	return items->array;
-}
+void *
+removeDA(DA *items){
 
-int sizeDA(DA *a){
-	return a->size;
-}
+	assert(items->size > 0);
 
-void visualizeDA(FILE *fp,DA *a){
-	if(a->array == NULL){
-			fprintf(fp,"[]");
-	fprintf(fp, "[%d]", a->capacity - a->size);
-			return;
+	int size = items->size;
+
+	if (( 0.25 > items->size / (double) items->capacity) && items->capacity != 1){
+		items->capacity = items->capacity / items->factor;
+		items->store = realloc(items->store, sizeof(void *) * items->capacity);
+		assert(items->store != 0);
 	}
-	int index = 0;
-	fprintf(fp,"[");
-	while(a->size - index > 0){
-		a->display(fp,a->array[index]);
-		if(index + 1 < a->size) {
+
+	--items->size;
+	return items->store[size - 1];
+}
+
+void
+unionDA(DA *recipient, DA *donor){
+
+	int i = 0;
+	int donorLen = donor->size;
+
+	while(i < donorLen){
+		insertDA(recipient, getDA(donor,i));
+		++i;	
+	}
+	i = 0;
+	while(i < donorLen){
+		removeDA(donor);
+		++i;
+	}
+
+	return;
+}
+
+void *
+getDA(DA *items, int index){
+	assert(index >= 0);
+	assert(index < items->size);
+
+	return items->store[index];
+}
+
+void *
+setDA(DA *items, int index, void *value){
+
+	assert(index >= 0);
+	assert(index <= items->size);
+
+	if (index == items->size){
+		insertDA(items, value);
+		return 0;
+	}
+
+	void *oldVal = getDA(items, index);
+	items->store[index] = value;
+
+	return oldVal;
+}
+
+void **
+extractDA(DA *items){
+
+	assert(items != 0);
+
+	items->store = realloc(items->store, sizeof(void *) * items->size);
+	assert(items->store != 0);
+
+	void **returnList = items->store;
+
+	items->capacity = 1;
+	items->size = 0;
+	items->store = malloc(sizeof(void *) * items->capacity);
+	assert(items->store != 0);
+
+	return returnList;
+}
+
+int
+sizeDA(DA *items){
+	return items->size;
+}
+
+void
+visualizeDA(FILE *fp, DA *items){
+
+	int i = 0;
+	fprintf(fp, "[");
+	while(i < items->size){
+		items->display(fp, items->store[i]);
+		if (items->size > 1 && i != items->size-1)
+		{
 			fprintf(fp, ",");
 		}
-		index++;
+		++i;
 	}
+
 	fprintf(fp, "]");
-	fprintf(fp, "[%d]", a->capacity - a->size);
+	fprintf(fp, "[");
+	int unfillReg = items->capacity - items->size;
+	fprintf(fp, "%d", unfillReg);
+	fprintf(fp, "]");
 }
 
-void displayDA(FILE *fp,DA *a){
-    if(a->array == NULL){
-        fprintf(fp,"[]");
-		//fprintf(fp, "[%d]", a->capacity - a->size);
-        return;
-    }
-	int index = 0;
-	fprintf(fp,"[");
-	while(a->size - index > 0){
-		a->display(fp,a->array[index]);
-		if(index + 1 < a->size) {
+void
+displayDA(FILE *fp, DA *items){
+	int i = 0;
+
+	fprintf(fp, "[");
+	while(i < items->size){
+		items->display(fp, items->store[i]);
+		if (items->size > 1 && i != items->size-1)
+		{
 			fprintf(fp, ",");
 		}
-		index++;
+		++i;
 	}
+
 	fprintf(fp, "]");
-	//fprintf(fp, "[%d]", a->capacity - a->size);
 }

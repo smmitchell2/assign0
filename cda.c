@@ -1,213 +1,269 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
+#include <string.h>
 #include "cda.h"
 
 struct cda{
-	void **array;
-	int capacity;
 	int size;
 	int startIndex;
 	int endIndex;
-	void (*display)(FILE *, void *);
+	int capacity;
+	void **store;
+	int factor;
+	void(*display) (FILE *, void *);
 };
 
-CDA *newCDA(void (*display)(FILE *,void *)){
-	CDA *a = malloc(sizeof(CDA));
-	a->array = malloc(sizeof(void *)*1);
-	a->capacity = 1;
-	a->size = 0;
-	a->startIndex = 0;
-	a->endIndex = 0;
-	a->display = display;
+/****** public methods ******/
 
-	return a;
+CDA *
+newCDA(void(*d)(FILE *, void *)){	
+	CDA *items = malloc(sizeof(CDA));
+
+	assert(items != 0);
+
+	items->size = 0;
+	items->startIndex = 0; 
+	items->endIndex = 0; 
+	items->capacity = 1;
+	items->store = malloc(sizeof(void *) * items->capacity);
+	
+	assert(items->store != 0);
+
+	items->factor = 2;
+	items->display = d;
+	
+	return items;
 }
 
-int correctIndex(CDA *a,int i){
-	//i = (a->startIndex + a->size) % a->capacity;
-	i = (i + a->capacity) % a->capacity;
-	return i;
+static int
+correctIndex(CDA *items, int index){
+	int correctedIndex = ((index + items->capacity) % items->capacity);
+	return correctedIndex;
 }
 
-// need to create new array when full
-//back should be (front + count - 1)%length
-//after removal front (front + 1)%length
-void insertCDAfront(CDA *a,void *v){ //doesnt insert correctly
-	if(a->size == 0){
-		insertCDAback(a,v);
+static void
+grow(CDA *items){
+
+	int newCapacity = items->capacity * items->factor;
+	int i;
+	void **newArray = malloc(sizeof(void *) * newCapacity);
+	
+	assert(newArray != 0);
+
+	for (i = 0; i < items->size; ++i)
+	{
+		newArray[i] = getCDA(items, i);
+	}
+	items->startIndex = 0;
+	items->endIndex = items->size;
+	items->store = newArray;
+	items->capacity = newCapacity;
+}
+
+static void
+shrink(CDA *items){
+	// Private method which shrinks array to new capacity, effectively a realloc()
+
+	int newCapacity = items->capacity / items->factor;
+	int i;
+	void **newArray = malloc(sizeof(void *) * newCapacity);
+	
+	assert(newArray != 0);
+
+	for (i = 0; i < items->size; ++i)
+	{
+		newArray[i] = getCDA(items, i);
+	}
+	items->startIndex = 0;
+	items->endIndex = items->size;
+	items->store = newArray;
+	items->capacity = newCapacity;
+}
+
+void
+insertCDAfront(CDA *items, void *value){
+	/*
+	This insert method places the item in the slot just prior to the first item in the filled region. 
+	If there is no room for the insertion, the array grows by doubling. 
+	It runs in amortized constant time. 
+	*/
+
+	assert(items != 0);
+
+	if (items->size == 0){
+		insertCDAback(items, value);
 		return;
 	}
-	if(a->size == a->capacity){	
-		int newCapacity = a->capacity*2;
-		/*need to put all values from old array to new array*/
-		void **newArray =  malloc(sizeof(void *)*newCapacity);
-		int i = 0;
-		int j = 0;
-		while(i<a->size){
-			if(a->startIndex+i < a->capacity){
-				newArray[i] = getCDA(a,a->startIndex+i);
-			}
-			else{
-				//need to figure how to go back to 0 and increment from there
-				newArray[j] = getCDA(a,j);
-				++j;
-			}
-			++i;
-		}
-		a->array = newArray;
-		a->capacity *= 2;
-	}
 
-	a->startIndex = correctIndex(a,a->startIndex-1);
-    a->array[a->startIndex] = v;
-    a->size += 1;
+	if (items->size == items->capacity){
+		grow(items);
+	}
+	
+	items->startIndex = correctIndex(items, items->startIndex - 1);
+	items->store[items->startIndex] = value;
+
+	++items->size;
+	return;
 }
 
-void insertCDAback(CDA *a,void *v){
-	if(a->size == a->capacity){
-		a->capacity *= 2;
-		a->array = realloc(a->array, a->capacity * sizeof(void *));
+void
+insertCDAback(CDA *items, void *value){
+
+	assert(items != 0);
+
+	if (items->size == items->capacity){
+		grow(items);
 	}
-	a->array[a->endIndex] = v;
-    a->endIndex = correctIndex(a,a->endIndex+1);
-    a->size += 1;
+	items->store[items->endIndex] = value;
+	items->endIndex = correctIndex(items, items->endIndex + 1);
+
+	++items->size;
+	return;
 }
 
-void *removeCDAfront(CDA *a){
-	if(a->size == 0){
-		fprintf(stderr, "Attempting to remove from an empty array\n");
-		exit(-1);
-	}
-	//if(a->startIndex+1 == a->capacity)
-	void *rv = a->array[a->startIndex];
-	a->array[a->startIndex] = NULL;
-	--a->size;
-	a->startIndex = a->startIndex + 1;
-	return rv;
-	/*int front = (a->startIndex + a->size) % a->capacity;
-	void *rv = a->array[front];
-	a->array[front] = NULL;
-	--a->size;
+void *
+removeCDAfront(CDA *items){
 
-	double size = a->size;
-	double capacity = a->capacity;
+	assert(items->size > 0);
 
-	if(size < capacity/4.0 && capacity > 2){
-		a->capacity /= 2;
-		a->array = realloc(a->array, a->capacity * sizeof(void *));
-	}
-	a->startIndex = (a->startIndex + a->size) % a->capacity;
-	return rv;*/
-}
-
-void *removeCDAback(CDA *a){
-	void *rv = a->array[a->endIndex];
-	if(a->size == 0){
-		fprintf(stderr, "Attempting to remove from an empty array\n");
-		exit(-1);
+	if ((0.25 > items->size /(double) items->capacity) && items->capacity != 1){
+		shrink(items);
 	}
 
-	a->array[a->endIndex] = NULL;
-	--a->size;
-	double size = a->size;
-	double capacity = a->capacity;
-	if(size < capacity/4.0 && capacity > 2){
-		a->capacity /= 2;
-		a->array = realloc(a->array, a->capacity * sizeof(void *));
-	}
-	a->endIndex = a->startIndex + a->size;
-	return rv;
+	void* returnItem = getCDA(items, 0);
+
+	items->startIndex = correctIndex(items, items->startIndex + 1);
+
+	--items->size;
+	return returnItem;
 }
 
-void unionCDA(CDA *recipient,CDA *donor){
-	for(int i = 0;i<=donor->size;++i){
-    	void *rm = removeCDAfront(donor);
-		insertCDAback(recipient,rm);
-	}
-}
+void *
+removeCDAback(CDA *items){
 
-void *getCDA(CDA *a,int index){
-	return a->array[index];
-}
+	assert(items->size > 0);
 
-void *setCDA(CDA *a,int index,void *value){ //fix
-	if(index == a->size) {
-		insertCDAfront(a,value);
-		return value;
+	if ((0.25 > items->size /(double) items->capacity) && items->capacity != 1){
+		shrink(items);
 	}
 
-	a->array[index] = value;
-	return value;
+	void* returnItem = getCDA(items, items->size - 1);
+
+	items->endIndex = correctIndex(items, items->endIndex - 1);
+
+	--items->size;
+	return returnItem;
 }
 
-void **extractCDA(CDA *items){
-	return items->array;
-}
+void
+unionCDA(CDA *recipient, CDA *donor){
 
-int sizeCDA(CDA *a){
-	return a->size;
-}
-
-void visualizeCDA(FILE *fp,CDA *a){
-	int index = 0;
-	fprintf(fp,"(");
-	while(a->size - index > 0){
-		a->display(fp,a->array[index]);
-		if(index + 1 < a->size) {
-			fprintf(fp, ",");
-		}
-		index++;
-	}
-	fprintf(fp, ")");
-
-	fprintf(fp, "(%d)", a->capacity - a->size);
-}
-
-void displayCDA(FILE *fp,CDA *a){
-
-	fprintf(fp, "startIndex:%d endIndex:%d size:%d capacity:%d\n",a->startIndex,a->endIndex,a->size,a->capacity );
-	a->display(fp,a->array[1]);
-
-	if(a->startIndex > a->endIndex){
-		fprintf(fp,"(");
-		int index = a->startIndex;
-		while(index >= a->endIndex ){
-			if(a->array[index] == NULL){break;}
-			a->display(fp,a->array[index]);
-			if(index - 1 > a->size) {
-				fprintf(fp, ",");
-			}
-			index--;
-		}
-		fprintf(fp, ")");
-	}
-  //if(a->startIndex <= a->endIndex)
-	else{
-		int index = a->startIndex;
-		fprintf(fp,"(");
-		while(index <= a->endIndex ){
-			if(a->array[index] == NULL){break;}
-			a->display(fp,a->array[index]);
-			if(index + 1 < a->size) {
-				fprintf(fp, ",");
-			}
-			index++;
-		}
-		fprintf(fp, ")");
-	}
-
-}
-
-void cdaCompleteDisplay(FILE *fp,CDA *a){
-	fprintf(fp, "startIndex:%d endIndex:%d size:%d capacity:%d\n",a->startIndex,a->endIndex,a->size,a->capacity );
 	int i = 0;
-	while (i < a->capacity){
-		if(a->array[i] == NULL){fprintf(fp,"[%d]: NULL \n",i);}
-		else{
-			fprintf(fp,"[%d]: ",i);
-			a->display(fp,a->array[i]);
-			fprintf(fp,"\n");
+	int donorLen = donor->size;
+	while(i < donorLen){
+		insertCDAback(recipient, getCDA(donor, i));
+		++i;
+	}
+	i = 0;
+	while(i < donorLen){
+		removeCDAfront(donor);
+		++i;
+	}
+
+	return;
+}
+
+void *
+getCDA(CDA *items, int index){
+	assert(index >= 0);
+	assert(index < items->size);
+
+	int correctedIndex = correctIndex(items, index + items->startIndex);
+	return items->store[correctedIndex];
+
+}
+
+void *
+setCDA(CDA *items, int index, void *value){
+
+	assert(index >= -1);
+	assert(index <= items->size);
+
+	if (index == items->size) {
+		insertCDAback(items, value);
+		return 0;
+	}
+
+	else if (index == -1) {
+		insertCDAfront(items, value);
+		return 0;
+	}
+
+	void *oldVal = getCDA(items, index);
+	int correctedIndex = correctIndex(items, index + items->startIndex);
+	items->store[correctedIndex] = value;
+
+	return oldVal;
+}
+
+void **
+extractCDA(CDA *items){
+
+	assert(items != 0);
+
+	shrink(items);
+	void **returnList = items->store;
+
+	items->capacity = 1;
+	items->size = 0;
+	items->store = malloc(sizeof(void *) * items->capacity);
+	
+	assert(items->store != 0);
+
+	return returnList;
+}
+
+int
+sizeCDA(CDA *items){ 
+	return items->size;
+}
+
+void
+visualizeCDA(FILE *fp, CDA *items){
+
+	int i = 0;
+
+	fprintf(fp, "(");
+	while(i < items->size){
+		items->display(fp, getCDA(items, i));
+		if (items->size > 1 && i != items->size - 1)
+		{
+			fprintf(fp, ",");
 		}
 		++i;
 	}
+
+	fprintf(fp, ")");
+	fprintf(fp, "(");
+	int unfillReg = items->capacity - items->size;
+	fprintf(fp, "%d", unfillReg);
+	fprintf(fp, ")");
+}
+
+void
+displayCDA(FILE *fp, CDA *items){
+	int i = 0;
+
+	fprintf(fp, "(");
+	while(i < items->size){
+		items->display(fp, getCDA(items, i));
+		if (items->size > 1 && i != items->size - 1)
+		{
+			fprintf(fp, ",");
+		}
+		++i;
+	}
+
+	fprintf(fp, ")");
 }

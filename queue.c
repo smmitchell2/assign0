@@ -1,39 +1,71 @@
-#include <stdlib.h>
 #include <stdio.h>
-#include "cda.h"
+#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
 #include "queue.h"
+#include "cda.h"
 
-//fifo
-queue *newQueue(void (*d)(FILE *,void *)){
-  queue *q = malloc(sizeof(queue));
-  q->list = newCDA(d);
-  return q;
+struct queue{
+	CDA *queueItems;
+	void(*display) (FILE *, void *);
+};
+
+/****** public methods ******/
+
+QUEUE *
+newQUEUE(void(*d)(FILE *, void *)){
+
+	QUEUE *items = malloc(sizeof(QUEUE));
+
+	assert(items != 0);
+	items->queueItems = newCDA(d);
+	items->display = d;
+
+	return items;
 }
 
-void enqueue(queue *items,void *value){
-  insertCDAfront(items->list,value);
+void
+enqueue(QUEUE *items, void *value){
+	insertCDAback(items->queueItems, value);
 }
 
-void *dequeue(queue *items){
-  void *r = removeCDAfront(items->list);
-  return r;
+void *
+dequeue(QUEUE *items){
+	assert(sizeCDA(items->queueItems) > 0);
+
+	return removeCDAfront(items->queueItems);
 }
 
-void *peekQueue(queue *items){
-  return items->list->head->value;
+void * 
+peekQUEUE(QUEUE *items){
+	assert(sizeCDA(items->queueItems) > 0);
+
+	return getCDA(items->queueItems, 0);
 }
 
-int sizeQueue(queue *items){
-  return items->list->size;
+int 
+sizeQUEUE(QUEUE *items){
+	return sizeCDA(items->queueItems);
 }
 
-void displayQueue(FILE *fp,queue *items){
-  /*CDA *temp = items->list->head;
-  fprintf(fp, "[" );
-  while(temp != NULL){
-    items->list->display(fp,temp->value);
-    if(temp->next != NULL){fprintf(fp,",");}
-    temp = temp->next;
-  }
-  fprintf(fp, "]");*/
+void
+displayQUEUE(FILE *fp, QUEUE *items){
+	int i = 0;
+	int size = sizeCDA(items->queueItems);
+
+	fprintf(fp, "<");
+	while(i < size){
+		items->display(fp, getCDA(items->queueItems, i));
+		if (size > 1 && i != size - 1){
+			fprintf(fp, ",");
+		}
+    ++i;
+	}
+
+	fprintf(fp, ">");
+}
+
+void
+visualizeQUEUE(FILE *fp, QUEUE *items){
+	displayCDA(fp, items->queueItems);
 }
