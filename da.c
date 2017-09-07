@@ -54,14 +54,14 @@ removeDA(DA *items){
 	assert(items->size > 0);
 	
 	int size = items->size;
-	--items->size;
-	if ( 0.25 > ((items->size / (double) items->capacity)) && items->capacity != 1){
+	
+	if ( 0.25 > ((items->size-1) / (double) items->capacity) && items->capacity != 1){
 		items->capacity = items->capacity / 2;
 		items->store = realloc(items->store, sizeof(void *) * items->capacity);
 		assert(items->store != 0);
 	}
 	
-	
+	--items->size;
 	return items->store[size - 1];
 }
 
