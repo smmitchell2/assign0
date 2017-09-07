@@ -10,7 +10,6 @@ struct cda{
 	int endIndex;
 	int capacity;
 	void **store;
-	int factor;
 	void(*display) (FILE *, void *);
 };
 
@@ -30,7 +29,6 @@ newCDA(void(*d)(FILE *, void *)){
 	
 	assert(items->store != 0);
 
-	items->factor = 2;
 	items->display = d;
 	
 	return items;
@@ -45,14 +43,13 @@ correctIndex(CDA *items, int index){
 static void
 grow(CDA *items){
 
-	int newCapacity = items->capacity * items->factor;
+	int newCapacity = items->capacity * 2;
 	int i;
 	void **newArray = malloc(sizeof(void *) * newCapacity);
 	
 	assert(newArray != 0);
 
-	for (i = 0; i < items->size; ++i)
-	{
+	for (i = 0; i < items->size; ++i){
 		newArray[i] = getCDA(items, i);
 	}
 	items->startIndex = 0;
@@ -63,16 +60,14 @@ grow(CDA *items){
 
 static void
 shrink(CDA *items){
-	// Private method which shrinks array to new capacity, effectively a realloc()
 
-	int newCapacity = items->capacity / items->factor;
+	int newCapacity = items->capacity / 2;
 	int i;
 	void **newArray = malloc(sizeof(void *) * newCapacity);
 	
 	assert(newArray != 0);
 
-	for (i = 0; i < items->size; ++i)
-	{
+	for (i = 0; i < items->size; ++i){
 		newArray[i] = getCDA(items, i);
 	}
 	items->startIndex = 0;
@@ -83,11 +78,6 @@ shrink(CDA *items){
 
 void
 insertCDAfront(CDA *items, void *value){
-	/*
-	This insert method places the item in the slot just prior to the first item in the filled region. 
-	If there is no room for the insertion, the array grows by doubling. 
-	It runs in amortized constant time. 
-	*/
 
 	assert(items != 0);
 

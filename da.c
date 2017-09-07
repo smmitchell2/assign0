@@ -8,7 +8,6 @@ struct da{
 	int size;
 	int capacity;
 	void **store;
-	int factor;
 	void (*display) (FILE *, void *);
 };
 
@@ -27,7 +26,6 @@ newDA(void (*d)(FILE *, void *)){
 	
 	assert(items->store != 0);
 
-	items->factor = 2;
 	items->display = d;
 
 	return items;
@@ -39,7 +37,7 @@ insertDA(DA *items, void *value){
 	assert(items != 0);
 
 	if (items->size == items->capacity){
-		items->capacity = items->capacity * items->factor;
+		items->capacity = items->capacity * 2;
 		items->store = realloc(items->store, sizeof(void *) * items->capacity);
 		assert(items->store != 0);
 	}
@@ -57,8 +55,8 @@ removeDA(DA *items){
 
 	int size = items->size;
 
-	if (( 0.25 > items->size / (double) items->capacity) && items->capacity != 1){
-		items->capacity = items->capacity / items->factor;
+	if (( 0.25 > ((double)items->size / (double) items->capacity)) && items->capacity != 1){
+		items->capacity = items->capacity / 2;
 		items->store = realloc(items->store, sizeof(void *) * items->capacity);
 		assert(items->store != 0);
 	}
